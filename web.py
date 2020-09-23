@@ -16,7 +16,6 @@ from selenium.common.exceptions import *
 import notification
 import settings
 import cookies
-import utils
 from utils import WaitValue, wait
 
 
