@@ -3,14 +3,15 @@ import utils
 from utils import WaitValue
 from PyQt5.QtCore import QObject, pyqtSignal
 
+
 class Rule(QObject):
     info = pyqtSignal(str, str)
 
-    def __init__(self, id, name='unknown', actions=None, initwait=None):
+    def __init__(self, identify, name='unknown', actions=None, initwait=None):
         super().__init__()
         self.actions = actions
         self.name = name
-        self.id = id
+        self.identify = identify
         self.initwait = initwait
 
     def run(self):
@@ -45,8 +46,8 @@ class Rules:
     def __init__(self):
         self.rules = []
 
-    def add(self, id, name='unknown', actions=None, initwait=None):
-        rule = Rule(id, name, actions,initwait)
+    def add(self, identify, name='unknown', actions=None, initwait=None):
+        rule = Rule(identify, name, actions, initwait)
         self.rules.append(rule)
 
     def connect(self, handler):

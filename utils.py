@@ -20,8 +20,6 @@ class WaitValue:
 
 
 def wait(spec, counter=None):
-    from utils import WaitValue
-
     if spec == "":
         return
 
@@ -38,4 +36,3 @@ def wait(spec, counter=None):
     if counter:
         counter(str(wait_time))
     time.sleep(wait_time)
-

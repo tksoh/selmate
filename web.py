@@ -1,6 +1,7 @@
 import traceback
 import re
 import os.path
+import urllib.parse
 import time
 import json
 from urllib3.exceptions import MaxRetryError
@@ -99,7 +100,6 @@ class MyWeb:
         self.json_flags = {}
 
     def set_url(self):
-        import urllib.parse
         if self.json_data:
             url = self.json_data[0]['url']
             parsed_url = urllib.parse.urlparse(url)

@@ -4,11 +4,13 @@ import utils
 from utils import WaitValue
 from PyQt5.QtCore import QObject, pyqtSignal
 
+
 def getvalue(foo):
     if isinstance(foo, types.FunctionType):
         return foo()
     else:
         return foo
+
 
 class Action(QObject):
     info = pyqtSignal(str, str)
@@ -33,6 +35,8 @@ class Action(QObject):
             wait_time = self.initwait.value()
         elif self.initwait:
             wait_time = self.initwait
+        else:
+            wait_time = 0
 
         self.info.emit('initwait', str(wait_time))
         time.sleep(wait_time)
@@ -50,6 +54,7 @@ class Action(QObject):
         except AttributeError:
             initwait = self.initwait
         self.info.emit('status', f'Running action: "{self.name}". Initwait = {initwait} ')
+
 
 class ActionList:
     def __init__(self):

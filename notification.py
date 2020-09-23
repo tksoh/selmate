@@ -81,6 +81,7 @@ def send_notifications(msg):
     sendmail(msg)
     notifyrun(msg)
 
+
 if __name__ == "__main__":
     import sys
     settings.init()

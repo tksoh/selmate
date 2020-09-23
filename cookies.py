@@ -30,4 +30,4 @@ def update(section, key, value):
 
 if __name__ == '__main__':
     init()
-    update('browser','session','xxx xxxx')
+    update('browser', 'session', 'xxx xxxx')
