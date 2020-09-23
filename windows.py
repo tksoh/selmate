@@ -215,6 +215,14 @@ class Window(QDialog):
                                 'Browser not nonnected/activated')
             return
 
+        if settings.check_file_modified():
+            reply = QMessageBox.question(self, 'Load INI',
+                                         'INI file has been modified. Reload?',
+                                         QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
+            if reply == QMessageBox.Yes:
+                settings.refresh()
+
+
         if self.myweb.check_json_file_modified():
             reply = QMessageBox.question(self, 'Load JSON',
                                          'JSON file has been modified. Reload?',
