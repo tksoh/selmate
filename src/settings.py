@@ -8,15 +8,17 @@ Configfile = os.path.expanduser(f'{ResourceDir}/app.ini')
 ConfigfileTime = None
 
 ConfigChecklist = [
-    ('chromium', 'exe'),
-    ('chromium', 'driver'),
-    ('chromium', 'user_data_dir'),
-    ('email', 'sender'),
-    ('email', 'password'),
-    ('email', 'to'),
-    ('media', 'soundtrack'),
-    ('pushbullet', 'key'),
-    ('notifyrun', 'channel'),
+    # (section, option, requirement)
+    ('web', 'browser', ()),
+    ('chromium', 'driver', ('web', 'browser', 'chromium')),
+    ('msedge', 'driver', ('web', 'browser', 'msedge')),
+    ('firefox', 'driver', ('web', 'browser', 'firefox')),
+    ('email', 'sender', ('notification', 'email', 'yes')),
+    ('email', 'password', ('notification', 'email', 'yes')),
+    ('email', 'to', ('notification', 'email', 'yes')),
+    ('media', 'soundtrack', ('notification', 'playsound', 'yes')),
+    ('pushbullet', 'key', ('notification', 'pushbullet', 'yes')),
+    ('notifyrun', 'channel', ('notification', 'notifyrun', 'yes')),
 ]
 
 
@@ -30,8 +32,13 @@ def init():
 
 
 def verify():
-    for section, key in ConfigChecklist:
-        if Config[section][key]:
+    for section, key, required in ConfigChecklist:
+        if required:
+            req_sec, rec_key, rec_val = required
+            val = Config[req_sec][rec_key]
+            if rec_val == val and Config[section][key]:
+                pass
+        elif Config[section][key]:
             pass
 
 
