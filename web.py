@@ -48,8 +48,10 @@ def start_browser(browser=None):
         return start_chrome()
     elif browser == 'firefox':
         return start_firefox()
-    elif browser == 'edge':
-        return start_edge()
+    elif browser == 'msedge':
+        return start_msedge()
+    else:
+        raise Exception(f"ERROR: unknown browser type '{browser}'")
 
 
 def start_chromium():
@@ -74,7 +76,7 @@ def start_firefox():
     return webdriver.Firefox(executable_path=geckodriver)
 
 
-def start_edge():
+def start_msedge():
     # need 'pip install msedge-selenium-tools' for Edge
     from msedge.selenium_tools import Edge, EdgeOptions
 
