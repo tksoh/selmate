@@ -106,11 +106,12 @@ class Window(QDialog):
             settings.init()
             cookies.init()
         except KeyError as err:
-            msg = f'{err} is not defined in setting file'
+            msg = f'ERROR: {err} is not defined in setting file'
+            self.postal.log(msg)
             QMessageBox.warning(self, 'Setting Error', msg)
             return
         except FileNotFoundError as err:
-            self.log(f'ERROR openning ini file: {err}')
+            self.postal.log(f'ERROR openning ini file: {err}')
 
     def set_app_title(self):
         project = settings.Config.get('web', 'project', fallback='untitled')
