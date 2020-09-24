@@ -58,8 +58,9 @@ def start_chromium():
     options = webdriver.ChromeOptions()
     options.binary_location = settings.Config['chromium']['exe']
     chromedriver = settings.Config['chromium']['driver']
-    user_data_dir = settings.Config['chromium']['user_data_dir']
-    options.add_argument(f"user-data-dir={user_data_dir}")
+    user_data_dir = settings.Config.get('chromium', 'user_data_dir', fallback='')
+    if user_data_dir:
+        options.add_argument(f"user-data-dir={user_data_dir}")
     options.add_argument("--allow-running-insecure-content")
     options.add_argument('--ignore-certificate-errors')
     return webdriver.Chrome(executable_path=chromedriver, options=options)
@@ -67,7 +68,9 @@ def start_chromium():
 
 def start_chrome():
     options = webdriver.ChromeOptions()
-    options.add_argument("user-data-dir=selenium")
+    user_data_dir = settings.Config.get('chrome', 'user_data_dir', fallback='')
+    if user_data_dir:
+        options.add_argument(f"user-data-dir={user_data_dir}")
     return webdriver.Chrome(options=options)
 
 
@@ -82,8 +85,9 @@ def start_msedge():
 
     options = EdgeOptions()
     options.use_chromium = True
-    user_data_dir = settings.Config['msedge']['user_data_dir']
-    options.add_argument(f'user-data-dir={user_data_dir}')
+    user_data_dir = settings.Config.get('msedge', 'user_data_dir', fallback='')
+    if user_data_dir:
+        options.add_argument(f'user-data-dir={user_data_dir}')
     edgedriver = settings.Config['msedge']['driver']
     driver = Edge(executable_path=edgedriver, options=options)
     return driver
