@@ -80,6 +80,8 @@ def start_edge():
 
     options = EdgeOptions()
     options.use_chromium = True
+    user_data_dir = settings.Config['msedge']['user_data_dir']
+    options.add_argument(f'user-data-dir={user_data_dir}')
     edgedriver = settings.Config['msedge']['driver']
     driver = Edge(executable_path=edgedriver, options=options)
     return driver
