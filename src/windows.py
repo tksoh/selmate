@@ -1,3 +1,10 @@
+#
+# Copyright 2020 TK Soh <teekaysoh@gmail.com>
+#
+# This software may be used and distributed according to the terms of the
+# GNU General Public License version 2, incorporated herein by reference.
+#
+
 from PyQt5.QtGui import QIntValidator, QTextCursor
 from PyQt5.QtWidgets import (
     QApplication, QDialog, QProgressBar,
