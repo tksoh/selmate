@@ -408,6 +408,7 @@ class MyWeb:
                 self.show_log("in Alert")
                 return
 
+            self.show_status('Running...')
             self.run_json()
 
         except TimeoutException as error:
