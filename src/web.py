@@ -210,6 +210,18 @@ class MyWeb:
         for rule in self.json_data:
             self.run_json_rule(rule)
 
+    def check_page_changed(self):
+        try:
+            # check if the page has changed or reloaded
+            if self.page_head:
+                WebDriverWait(self.driver, 0, poll_frequency=0.1).until(EC.staleness_of(self.page_head))
+                return True
+            else:
+                return True
+        except TimeoutException:
+            pass
+        return False
+
     def run_json_rule(self, rule):
         if not rule['enable']:
             return
@@ -217,13 +229,9 @@ class MyWeb:
         if not self.check_url(rule['url']):
             return
 
-        try:
-            # check if the page has changed or reloaded
-            if self.page_head:
-                WebDriverWait(self.driver, 0).until(EC.staleness_of(self.page_head))
-                pass
+        if self.check_page_changed():
             self.page_head = self.driver.find_element_by_tag_name('head')
-        except TimeoutException:
+        else:
             return
 
         self.show_status(f"Running rule: \"{rule['name']}\". Initwait = {rule['initWait']}")
