@@ -57,6 +57,8 @@ def start_browser(browser=None):
         return start_firefox()
     elif browser == 'msedge':
         return start_msedge()
+    elif browser == 'opera':
+        return start_opera()
     else:
         raise Exception(f"ERROR: unknown browser type '{browser}'")
 
@@ -97,6 +99,14 @@ def start_msedge():
         options.add_argument(f'user-data-dir={user_data_dir}')
     edgedriver = settings.Config['msedge']['driver']
     driver = Edge(executable_path=edgedriver, options=options)
+    return driver
+
+
+def start_opera():
+    # options = webdriver.opera.options.Options
+    # options.binary_location =
+    operadriver = settings.Config['opera']['driver']
+    driver = webdriver.Opera(executable_path=operadriver)
     return driver
 
 
