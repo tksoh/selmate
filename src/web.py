@@ -412,22 +412,24 @@ class MyWeb:
             self.run_json()
 
         except TimeoutException as error:
-            print(traceback.format_exc())
+            self.show_log("TIMEOUT when running rules!")
+            self.show_log(traceback.format_exc())
             errmsg = str(error)
             try:
                 self.driver.get_cookies()   # check if browser still healthy
+                self.page_head = None
             except TimeoutException:
                 self.send_notification(f"Houston, we have a problem! {errmsg}")
                 self.pause()
         except NoSuchWindowException:
             self.show_log('Detected NoSuchWindowException error')
-            print("\n[NoSuchWindowException]\n")
-            print(traceback.format_exc())
-            pass
+            self.show_log(traceback.format_exc())
         except ElementNotInteractableException as error:
-            print(traceback.format_exc())
+            self.show_log("ERROR when running rules!")
+            self.show_log(traceback.format_exc())
             errmsg = str(error)
             self.send_notification(f"Houston, we have a problem! {errmsg}")
+            self.show_log('Control halted')
             self.pause()
         except Exception as error:
             self.show_log(error)
