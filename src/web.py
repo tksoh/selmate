@@ -122,6 +122,9 @@ class MyWeb:
         self.last_url = ""
         self.page_head = None
         self.json_flags = {}
+        self.current_rule = ""
+        self.current_action = ""
+        self.current_action_index = -1
 
     def set_url(self):
         if self.json_data:
@@ -233,6 +236,8 @@ class MyWeb:
         return False
 
     def run_json_rule(self, rule):
+        self.current_rule = rule.get('name', '(unknown)')
+
         if not rule['enable']:
             return
 
@@ -246,7 +251,9 @@ class MyWeb:
 
         self.show_status(f"Running rule: \"{rule['name']}\". Initwait = {rule['initWait']}")
         wait(rule['initWait'], counter=self.countdown)
-        for action in rule["actions"]:
+        for idx, action in enumerate(rule["actions"]):
+            self.current_action = action.get('name', '(unknown)')
+            self.current_action_index = idx
             self.run_json_action(action)
 
     def run_json_action(self, action):
@@ -421,6 +428,10 @@ class MyWeb:
     def check_page_loaded(self):
         return self.driver.execute_script('return document.readyState') == "complete"
 
+    def show_rule_info(self):
+        self.show_log(f"  Rule: '{self.current_rule}'")
+        self.show_log(f"  Action: [{self.current_action_index}] '{self.current_action}'")
+
     def check(self):
         # start monitoring for transaction
         if not self.started or self.paused:
@@ -436,6 +447,7 @@ class MyWeb:
 
         except TimeoutException as error:
             self.show_log("TIMEOUT when running rules!")
+            self.show_rule_info()
             self.show_log(traceback.format_exc())
             errmsg = str(error)
             try:
@@ -446,9 +458,11 @@ class MyWeb:
                 self.pause()
         except NoSuchWindowException:
             self.show_log('Detected NoSuchWindowException error')
+            self.show_rule_info()
             self.show_log(traceback.format_exc())
         except ElementNotInteractableException as error:
             self.show_log("ERROR when running rules!")
+            self.show_rule_info()
             self.show_log(traceback.format_exc())
             errmsg = str(error)
             self.send_notification(f"Houston, we have a problem! {errmsg}")
@@ -456,6 +470,7 @@ class MyWeb:
             self.pause()
         except Exception as error:
             self.show_log(error)
+            self.show_rule_info()
             self.show_log('Control halted')
             self.pause()
 
