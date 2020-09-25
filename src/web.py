@@ -266,6 +266,8 @@ class MyWeb:
             pass
         except StaleElementReferenceException:
             pass
+        except ElementNotInteractableException:
+            pass
 
     def check_json_criteria(self, action):
         criterion = action['addon']
