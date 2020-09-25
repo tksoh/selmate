@@ -259,7 +259,10 @@ class MyWeb:
                 elem.clear()
                 elem.send_keys(action['value'])
             else:
-                self.click(elem)
+                if elem.tag_name == 'input' and elem.get_attribute('type') == 'text':
+                    elem.send_keys(Keys.ENTER)
+                else:
+                    self.click(elem)
 
             self.set_json_flags(action)
         except NoSuchElementException:
