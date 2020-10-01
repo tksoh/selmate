@@ -224,16 +224,19 @@ class MyWeb:
             self.run_json_rule(rule)
 
     def check_page_changed(self):
+        # check if the page has changed or reloaded
+        if not self.page_head:
+            return True
+
         try:
-            # check if the page has changed or reloaded
-            if self.page_head:
-                WebDriverWait(self.driver, 0, poll_frequency=0.1).until(EC.staleness_of(self.page_head))
-                return True
-            else:
-                return True
-        except TimeoutException:
-            pass
-        return False
+            hd = self.driver.find_element_by_tag_name('head')
+        except NoSuchElementException:
+            return True
+
+        if hd == self.page_head:
+            return False
+        else:
+            return True
 
     def run_json_rule(self, rule):
         self.current_rule = rule.get('name', '(unknown)')
