@@ -263,6 +263,9 @@ class MyWeb:
         if not action.get('enable', True):
             return
 
+        if self.check_page_changed():
+            return
+
         wait(action['initWait'], counter=self.countdown)
         try:
             elem = self.driver.find_element_by_xpath(action['xpath'])
