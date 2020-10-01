@@ -203,8 +203,8 @@ class Window(QDialog):
             pass
 
     def log(self, text):
-        self.syslog.moveCursor(QTextCursor.End)
         self.syslog.insertPlainText(text)
+        self.syslog.moveCursor(QTextCursor.End)
 
     def status_update(self, text):
         self.status_bar.setText(text)
