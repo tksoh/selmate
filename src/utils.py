@@ -43,3 +43,20 @@ def wait(spec, counter=None):
     if counter:
         counter(str(wait_time))
     time.sleep(wait_time)
+
+
+def get_wait(spec):
+    if spec == "":
+        return 0
+
+    arr = re.split(r'[e\s]+', spec.strip())
+    if len(arr) == 2:
+        start, stop = arr
+    elif len(arr) == 1:
+        start = arr[0]
+        stop = 0
+    else:
+        return 0
+
+    wait_time = WaitValue(start, stop).value()
+    return wait_time

@@ -11,6 +11,7 @@ import os.path
 import urllib.parse
 import time
 import json
+import threading
 from urllib3.exceptions import MaxRetryError
 from urllib.parse import urlparse
 from selenium import webdriver
@@ -23,7 +24,7 @@ from selenium.common.exceptions import *
 import notification
 import settings
 import cookies
-from utils import WaitValue, wait
+from utils import get_wait
 
 
 def attach_to_session(executor_url, session_id):
@@ -238,6 +239,29 @@ class MyWeb:
         else:
             return True
 
+    def wait_in_page(self, spec):
+        def check_page():
+            while self.keep_wait:
+                if self.check_page_changed():
+                    self.keep_wait = False
+                    wait_event.set()
+                time.sleep(0.5)
+
+        checker = threading.Thread(target=check_page)
+        wait_event = threading.Event()
+        wait_time = get_wait(spec)
+
+        # start waiting until page changed
+        self.countdown(str(wait_time))
+        self.keep_wait = True
+        checker.start()
+        wait_event.wait(wait_time)
+        self.countdown("0")
+
+        # stop the page changed check
+        self.keep_wait = False
+        checker.join()
+
     def run_json_rule(self, rule):
         self.current_rule = rule.get('name', '(unknown)')
 
@@ -253,7 +277,7 @@ class MyWeb:
             return
 
         self.show_status(f"Running rule: \"{rule['name']}\". Initwait = {rule['initWait']}")
-        wait(rule['initWait'], counter=self.countdown)
+        self.wait_in_page(rule['initWait'])
         for idx, action in enumerate(rule["actions"]):
             self.current_action = action.get('name', '(unknown)')
             self.current_action_index = idx
@@ -266,7 +290,7 @@ class MyWeb:
         if self.check_page_changed():
             return
 
-        wait(action['initWait'], counter=self.countdown)
+        self.wait_in_page(action['initWait'])
         try:
             elem = self.driver.find_element_by_xpath(action['xpath'])
             if not self.check_json_criteria(action) or \
