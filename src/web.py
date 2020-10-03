@@ -335,15 +335,20 @@ class MyWeb:
             return True
 
         try:
-            elem = self.driver.find_element_by_xpath(criterion['xpath'])
+            xpath = criterion['xpath']
+            uv = criterion['value']
+            operator = criterion['condition']
+        except KeyError as error:
+            raise Exception(f"Missing key in addon: '{error}'")
+
+        try:
+            elem = self.driver.find_element_by_xpath(xpath)
             if elem.tag_name == 'input':
                 ev = elem.get_attribute('value')
             elif elem.tag_name == 'label':
                 ev = elem.text
             else:
                 ev = elem.text
-            uv = criterion['value']
-            operator = criterion['condition']
             op = operator.lower()
             if op in ('equals', '=='):
                 result = ev == uv
@@ -378,11 +383,15 @@ class MyWeb:
 
         final = True
         for flag in flags:
-            name = flag['name']
-            ev = self.json_flags.get(name, "")
-            uv = flag['value']
-            operator = flag['condition']
+            try:
+                name = flag['name']
+                uv = flag['value']
+                operator = flag['condition']
+            except KeyError as error:
+                raise Exception(f"Missing key in flagCheck: '{error}'")
+
             op = operator.lower()
+            ev = self.json_flags.get(name, "")
             if op in ('equals', '=='):
                 result = ev == uv
             elif op in ('notequals', '!='):
