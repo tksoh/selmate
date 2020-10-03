@@ -205,20 +205,22 @@ class MyWeb:
             return False
 
     def load_json(self):
-        if settings.Config.get('rules', 'use_json', fallback='false') != 'true':
-            return
-
         try:
             file = settings.Config['rules']['json_file']
+            self.show_log(f'Loading JSON file \'{file}\'')
             with open(file) as f:
                 self.json_data = json.load(f)
             self.json_file_time = os.path.getmtime(file)
         except FileNotFoundError as emsg:
             self.show_log(f'ERROR reading JSON file: {emsg}')
+            return False
         except json.decoder.JSONDecodeError as emsg:
             self.show_log(f'ERROR reading JSON file: {emsg}')
+            return False
         else:
-            self.show_log(f'JSON file loaded: {file}')
+            self.show_log(f'JSON file loaded')
+
+        return True
 
     def run_json(self):
         for rule in self.json_data:

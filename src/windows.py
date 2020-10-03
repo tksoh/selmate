@@ -230,22 +230,29 @@ class Window(QDialog):
             if reply == QMessageBox.Yes:
                 settings.refresh()
 
-
         if self.myweb.check_json_file_modified():
-            reply = QMessageBox.question(self, 'Load JSON',
-                                         'JSON file has been modified. Reload?',
-                                         QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
-            if reply == QMessageBox.Yes:
-                self.myweb.load_json()
+            if self.myweb.json_data:
+                msg = 'JSON file has been modified. Reload it?'
+            else:
+                msg = 'JSON file not loaded. Load it?'
 
-        self.myweb.clear()
-        self.myweb.pause(False)
-        self.web_thread = WebThread(self.myweb)
-        self.web_thread.start()
-        self.start_button.setDisabled(True)
-        self.stop_button.setDisabled(False)
-        self.update_connection_info()
-        self.postal.log("Start control")
+            reply = QMessageBox.question(self, 'Load JSON', msg,
+                                     QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
+            if reply == QMessageBox.Yes:
+                if not self.myweb.load_json() and self.myweb.json_data:
+                    self.postal.log("Continue with previously loaded JSON data")
+
+        if self.myweb.json_data:
+            self.myweb.clear()
+            self.myweb.pause(False)
+            self.web_thread = WebThread(self.myweb)
+            self.web_thread.start()
+            self.start_button.setDisabled(True)
+            self.stop_button.setDisabled(False)
+            self.update_connection_info()
+            self.postal.log("Control started")
+        else:
+            self.postal.log("Unable to start. JSON data not loaded")
 
     def stop_progress_bar(self):
         self.progress_enabled = False
@@ -260,7 +267,7 @@ class Window(QDialog):
         self.stop_button.setDisabled(True)
         self.set_progress_val(0)
         self.postal.status('Idle')
-        self.postal.log("Stop control")
+        self.postal.log("Control stopped")
 
     def reset_progress_bar(self, text):
         assert int(text) <= 1000
