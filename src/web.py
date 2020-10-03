@@ -347,10 +347,14 @@ class MyWeb:
                 result = ev == uv
             elif op in ('notequals', '!='):
                 result = ev != uv
-            elif op in ('contains', '~'):
+            elif op in ('contains', '@'):
                 result = uv in ev
-            elif op in ('notcontains', '!~'):
+            elif op in ('notcontains', '!@'):
                 result = uv not in ev
+            elif op in ('search', '~'):
+                result = re.search(uv, ev) is not None
+            elif op in ('notsearch', '!~'):
+                result = re.search(uv, ev) is None
             elif op in ('lessthan', '<'):
                 result = float(ev) < float(uv)
             elif op in ('lessthanequals', '<='):
@@ -381,10 +385,14 @@ class MyWeb:
                 result = ev == uv
             elif op in ('notequals', '!='):
                 result = ev != uv
-            elif op in ('contains', '~'):
+            elif op in ('contains', '@'):
                 result = uv in ev
-            elif op in ('notcontains', '!~'):
+            elif op in ('notcontains', '!@'):
                 result = uv not in ev
+            elif op in ('search', '~'):
+                result = re.search(uv, ev) is not None
+            elif op in ('notsearch', '!~'):
+                result = re.search(uv, ev) is None
             elif op in ('lessthan', '<'):
                 result = float(ev) < float(uv)
             elif op in ('lessthanequals', '<='):
