@@ -249,11 +249,13 @@ class MyWeb:
                     wait_event.set()
                 time.sleep(0.5)
 
-        checker = threading.Thread(target=check_page)
-        wait_event = threading.Event()
         wait_time = get_wait(spec)
+        if not wait_time:
+            return
 
         # start waiting until page changed
+        checker = threading.Thread(target=check_page)
+        wait_event = threading.Event()
         self.countdown(str(wait_time))
         self.keep_wait = True
         checker.start()
