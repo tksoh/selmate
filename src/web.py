@@ -283,6 +283,8 @@ class MyWeb:
         for idx, action in enumerate(rule["actions"]):
             self.current_action = action.get('name', '(unknown)')
             self.current_action_index = idx
+            self.show_status(f"Running rule: \"{rule['name']}\". Initwait = {rule['initWait']} "
+                             f"[Action #{idx}: {self.current_action}]")
             self.run_json_action(action)
 
     def run_json_action(self, action):
