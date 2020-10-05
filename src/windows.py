@@ -40,7 +40,7 @@ class WebThread(QThread):
     def run(self):
         while True:
             self.myweb.check()
-            time.sleep(1)
+            time.sleep(0.1)
 
 
 class QueueThread(QThread):
