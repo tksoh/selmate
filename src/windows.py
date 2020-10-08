@@ -79,7 +79,7 @@ class Postal(object):
 
     def log(self, text, timed=True):
         if timed:
-            tm = datetime.now().strftime("%H:%M:%S")
+            tm = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
             msg = f"[{tm}] {text}\n"
         else:
             msg = text
