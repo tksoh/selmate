@@ -154,7 +154,7 @@ class Window(QDialog):
         self.timer.timeout.connect(self.move_progress)
 
         hbox = QHBoxLayout()
-        vbox.addWidget(QLabel("Connection Setting:"))
+        vbox.addWidget(QLabel("Browser Session:"))
         vbox.addLayout(hbox)
         self.connect_settings = QLineEdit("")
         hbox.addWidget(self.connect_settings)
