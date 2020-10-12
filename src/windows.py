@@ -5,7 +5,7 @@
 # GNU General Public License version 2, incorporated herein by reference.
 #
 
-from PyQt5.QtGui import QIntValidator, QTextCursor
+from PyQt5.QtGui import QIntValidator, QTextCursor, QFontMetrics
 from PyQt5.QtWidgets import (
     QApplication, QDialog, QProgressBar,
     QPushButton, QVBoxLayout, QHBoxLayout, QLabel,
@@ -207,7 +207,9 @@ class Window(QDialog):
         self.syslog.moveCursor(QTextCursor.End)
 
     def status_update(self, text):
-        self.status_bar.setText(text)
+        fm = QFontMetrics(self.status_bar.font())
+        elided = fm.elidedText(text, Qt.ElideRight, self.status_bar.width() - 10)
+        self.status_bar.setText(elided)
 
     def notify(self, text):
         notifyrun(text)
