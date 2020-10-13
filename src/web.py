@@ -297,6 +297,9 @@ class MyWeb:
             return
 
         self.wait_in_page(action['initWait'])
+        if self.check_page_changed():
+            return
+
         try:
             elem = self.driver.find_element_by_xpath(action['xpath'])
             if not self.check_json_criteria(action) or \
