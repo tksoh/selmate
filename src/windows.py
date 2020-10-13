@@ -317,6 +317,7 @@ class Window(QDialog):
                 self.postal.log(msg)
             else:
                 self.update_connection_info()
+                self.myweb.end()
                 self.connect_browser()
                 self.start_button.setDisabled(False)
 
