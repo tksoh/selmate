@@ -5,6 +5,7 @@
 # GNU General Public License version 2, incorporated herein by reference.
 #
 
+import sys
 import traceback
 import re
 import os.path
@@ -534,8 +535,16 @@ class MyWeb:
 if __name__ == '__main__':
     settings.init()
     cookies.init()
-    webdrive = start_browser()
-    eurl = webdrive.command_executor._url
-    sid = webdrive.session_id
-    print(eurl, sid)
-    cookies.update('browser', 'session', f'{eurl} {sid}')
+    try:
+        webdrive = start_browser()
+        eurl = webdrive.command_executor._url
+        sid = webdrive.session_id
+        print(eurl, sid)
+        cookies.update('browser', 'session', f'{eurl} {sid}')
+    except SessionNotCreatedException as error:
+        print(f'ERROR when starting browser: {error}')
+        sys.exit(1)
+    except Exception as error:
+        print(f'ERROR when starting browser: {error}')
+        sys.exit(1)
+

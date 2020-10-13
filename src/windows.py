@@ -306,14 +306,19 @@ class Window(QDialog):
             if reply != QMessageBox.Yes:
                 return
 
+        self.postal.log('starting new browser')
         cmd = [sys.executable, 'web.py']
         flags = subprocess.DETACHED_PROCESS | subprocess.CREATE_NEW_PROCESS_GROUP
         with Popen(cmd, stdin=PIPE, stdout=PIPE, stderr=PIPE, shell=False,
                    creationflags=flags) as proc:
-            print(proc.stdout.readline())
-        self.update_connection_info()
-        self.connect_browser()
-        self.start_button.setDisabled(False)
+            proc.wait()
+            if proc.returncode:
+                msg = str(proc.stdout.readline(), 'utf-8')
+                self.postal.log(msg)
+            else:
+                self.update_connection_info()
+                self.connect_browser()
+                self.start_button.setDisabled(False)
 
     def connect_browser(self):
         if self.myweb.is_started():
