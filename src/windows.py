@@ -7,7 +7,7 @@
 
 from PyQt5.QtGui import QIntValidator, QTextCursor, QFontMetrics
 from PyQt5.QtWidgets import (
-    QApplication, QDialog, QProgressBar,
+    QApplication, QDialog, QProgressBar, QAction,
     QPushButton, QVBoxLayout, QHBoxLayout, QLabel,
     QTextEdit, QLineEdit, QMessageBox, QFrame, QCheckBox
 )
@@ -132,6 +132,8 @@ class Window(QDialog):
         self.setGeometry(400, 400, 500, 500)
         vbox.addWidget(QLabel("System log:"))
         self.syslog = QTextEdit()
+        self.syslog.setContextMenuPolicy(Qt.CustomContextMenu)
+        self.syslog.customContextMenuRequested.connect(self.generate_context_menu)
         self.syslog.setReadOnly(True)
         vbox.addWidget(self.syslog)
 
@@ -193,6 +195,21 @@ class Window(QDialog):
         self.postal.status('Idle')
 
         self.show()
+
+    def clear_log_window(self):
+        self.syslog.clear()
+
+    def generate_context_menu(self, location):
+        menu = self.syslog.createStandardContextMenu(location)
+
+        # add extra items to the menu
+        menu.addSeparator()
+        clear_action = QAction("Clear system log", self)
+        clear_action.triggered.connect(self.clear_log_window)
+        menu.addAction(clear_action)
+
+        # show the menu
+        menu.exec_(self.mapToGlobal(location))
 
     def update_connection_info(self):
         try:
