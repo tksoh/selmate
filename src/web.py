@@ -79,10 +79,11 @@ def start_chromium():
 
 def start_chrome():
     options = webdriver.ChromeOptions()
+    chromedriver = settings.Config['chrome']['driver']
     user_data_dir = settings.Config.get('chrome', 'user_data_dir', fallback='')
     if user_data_dir:
         options.add_argument(f"user-data-dir={user_data_dir}")
-    return webdriver.Chrome(options=options)
+    return webdriver.Chrome(executable_path=chromedriver, options=options)
 
 
 def start_firefox():
