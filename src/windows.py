@@ -11,12 +11,11 @@ from PyQt5.QtWidgets import (
     QPushButton, QVBoxLayout, QHBoxLayout, QLabel,
     QTextEdit, QLineEdit, QMessageBox, QFrame, QCheckBox
 )
-from PyQt5.QtCore import QThread, pyqtSignal, Qt, QTimer
+from PyQt5.QtCore import QThread, pyqtSignal, Qt, QTimer, QProcess
 import time
 import sys
 import re
-import subprocess
-from subprocess import Popen, PIPE
+import functools
 from datetime import datetime
 from queue import Queue
 from web import MyWeb
@@ -323,20 +322,29 @@ class Window(QDialog):
             if reply != QMessageBox.Yes:
                 return
 
-        self.postal.log('starting new browser')
-        cmd = [sys.executable, 'web.py']
-        flags = subprocess.DETACHED_PROCESS | subprocess.CREATE_NEW_PROCESS_GROUP
-        with Popen(cmd, stdin=PIPE, stdout=PIPE, stderr=PIPE, shell=False,
-                   creationflags=flags) as proc:
-            proc.wait()
-            if proc.returncode:
-                msg = str(proc.stdout.readline(), 'utf-8')
-                self.postal.log(msg)
-            else:
+        cmd = f'{sys.executable} web.py'
+        process = QProcess()
+
+        def started():
+            self.postal.log('Starting new browser')
+
+        def finished():
+            rv = process.exitCode()
+            if not rv:
                 self.update_connection_info()
                 self.myweb.end()
                 self.connect_browser()
                 self.start_button.setDisabled(False)
+                self.postal.log('Browser started')
+
+        def read_output(p):
+            self.postal.log(str(p.readAllStandardOutput(), 'utf-8'))
+
+        process.started.connect(started)
+        process.readyReadStandardOutput.connect(functools.partial(read_output, process))
+        process.finished.connect(finished)
+        process.start(cmd)
+        self.browser_process = process
 
     def connect_browser(self):
         if self.myweb.is_started():
