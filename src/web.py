@@ -91,6 +91,14 @@ def start_firefox():
     return webdriver.Firefox(executable_path=geckodriver)
 
 
+def start_IE():
+    from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
+    cap = DesiredCapabilities.INTERNETEXPLORER.copy()
+    cap['INTRODUCE_FLAKINESS_BY_IGNORING_SECURITY_DOMAINS'] = True
+    driver = settings.Config['IE']['driver']
+    return webdriver.Ie(executable_path=driver, capabilities=cap)
+
+
 def start_msedge():
     # need 'pip install msedge-selenium-tools' for Edge
     from msedge.selenium_tools import Edge, EdgeOptions
