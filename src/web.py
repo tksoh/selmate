@@ -537,6 +537,7 @@ class MyWeb:
         except Exception as error:
             self.show_log(error)
             self.show_rule_info()
+            self.send_notification(f"Houston, we have a problem! {errmsg}")
             self.show_log('Control halted')
             self.pause()
 
