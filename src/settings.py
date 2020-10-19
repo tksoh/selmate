@@ -17,10 +17,6 @@ ConfigfileTime = None
 ConfigChecklist = [
     # (section, option, requirement)
     ('web', 'browser', ()),
-    ('chrome', 'driver', ('web', 'browser', 'chrome')),
-    ('chromium', 'driver', ('web', 'browser', 'chromium')),
-    ('msedge', 'driver', ('web', 'browser', 'msedge')),
-    ('firefox', 'driver', ('web', 'browser', 'firefox')),
     ('email', 'sender', ('notification', 'email', 'yes')),
     ('email', 'password', ('notification', 'email', 'yes')),
     ('email', 'to', ('notification', 'email', 'yes')),

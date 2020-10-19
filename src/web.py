@@ -49,27 +49,28 @@ def attach_to_session(executor_url, session_id):
 
 def start_browser(browser=None):
     if browser is None:
-        browser = settings.Config.get('web', 'browser', fallback='chromium').lower()
+        browser_config = settings.Config.get('web', 'browser', fallback='chrome').lower()
+        browser = settings.Config.get(browser_config, 'browser', fallback='chrome').lower()
 
     if browser == 'chromium':
-        return start_chromium()
+        return start_chromium(browser_config)
     elif browser == 'chrome':
-        return start_chrome()
+        return start_chrome(browser_config)
     elif browser == 'firefox':
-        return start_firefox()
+        return start_firefox(browser_config)
     elif browser == 'msedge':
-        return start_msedge()
+        return start_msedge(browser_config)
     elif browser == 'opera':
-        return start_opera()
+        return start_opera(browser_config)
     else:
-        raise Exception(f"ERROR: unknown browser type '{browser}'")
+        raise Exception(f"ERROR: unknown browser config '{browser}'")
 
 
-def start_chromium():
+def start_chromium(browser_config):
     options = webdriver.ChromeOptions()
-    options.binary_location = settings.Config['chromium']['exe']
-    chromedriver = settings.Config['chromium']['driver']
-    user_data_dir = settings.Config.get('chromium', 'user_data_dir', fallback='')
+    options.binary_location = settings.Config[browser_config]['exe']
+    chromedriver = settings.Config[browser_config]['driver']
+    user_data_dir = settings.Config.get(browser_config, 'user_data_dir', fallback='')
     if user_data_dir:
         options.add_argument(f"user-data-dir={user_data_dir}")
     options.add_argument("--allow-running-insecure-content")
@@ -77,46 +78,46 @@ def start_chromium():
     return webdriver.Chrome(executable_path=chromedriver, options=options)
 
 
-def start_chrome():
+def start_chrome(browser_config):
     options = webdriver.ChromeOptions()
-    chromedriver = settings.Config['chrome']['driver']
-    user_data_dir = settings.Config.get('chrome', 'user_data_dir', fallback='')
+    chromedriver = settings.Config[browser_config]['driver']
+    user_data_dir = settings.Config.get(browser_config, 'user_data_dir', fallback='')
     if user_data_dir:
         options.add_argument(f"user-data-dir={user_data_dir}")
     return webdriver.Chrome(executable_path=chromedriver, options=options)
 
 
-def start_firefox():
-    geckodriver = settings.Config['firefox']['driver']
+def start_firefox(browser_config):
+    geckodriver = settings.Config[browser_config]['driver']
     return webdriver.Firefox(executable_path=geckodriver)
 
 
-def start_IE():
+def start_IE(browser_config):
     from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
     cap = DesiredCapabilities.INTERNETEXPLORER.copy()
     cap['INTRODUCE_FLAKINESS_BY_IGNORING_SECURITY_DOMAINS'] = True
-    driver = settings.Config['IE']['driver']
+    driver = settings.Config[browser_config]['driver']
     return webdriver.Ie(executable_path=driver, capabilities=cap)
 
 
-def start_msedge():
+def start_msedge(browser_config):
     # need 'pip install msedge-selenium-tools' for Edge
     from msedge.selenium_tools import Edge, EdgeOptions
 
     options = EdgeOptions()
     options.use_chromium = True
-    user_data_dir = settings.Config.get('msedge', 'user_data_dir', fallback='')
+    user_data_dir = settings.Config.get(browser_config, 'user_data_dir', fallback='')
     if user_data_dir:
         options.add_argument(f'user-data-dir={user_data_dir}')
-    edgedriver = settings.Config['msedge']['driver']
+    edgedriver = settings.Config[browser_config]['driver']
     driver = Edge(executable_path=edgedriver, options=options)
     return driver
 
 
-def start_opera():
+def start_opera(browser_config):
     # options = webdriver.opera.options.Options
     # options.binary_location =
-    operadriver = settings.Config['opera']['driver']
+    operadriver = settings.Config[browser_config]['driver']
     driver = webdriver.Opera(executable_path=operadriver)
     return driver
 
@@ -553,6 +554,9 @@ if __name__ == '__main__':
         cookies.update('browser', 'session', f'{eurl} {sid}')
     except SessionNotCreatedException as error:
         print(f'ERROR when starting browser: {error}')
+        sys.exit(1)
+    except KeyError as error:
+        print(f'ERROR when starting browser: undefined config {error}')
         sys.exit(1)
     except Exception as error:
         print(f'ERROR when starting browser: {error}')
