@@ -77,7 +77,7 @@ class Postal(object):
         self.notify_queue = win.notify_queue
 
     def log(self, text, timed=True):
-        text = str(text).strip()
+        text = str(text).rstrip()
         if timed:
             tm = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
             msg = f"[{tm}] {text}\n"
