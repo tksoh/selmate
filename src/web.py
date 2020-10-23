@@ -525,21 +525,28 @@ class MyWeb:
                 self.pause()
         except NoSuchWindowException:
             self.show_log('Detected NoSuchWindowException error')
+            self.show_log(str(error))
             self.show_rule_info()
             self.show_log(traceback.format_exc())
         except ElementNotInteractableException as error:
-            self.show_log("ERROR when running rules!")
+            self.show_log('Detected ElementNotInteractableException error')
+            self.show_log(str(error))
             self.show_rule_info()
             self.show_log(traceback.format_exc())
+        except WebDriverException as error:
+            self.show_log('Detected WebDriverException error')
             errmsg = str(error)
-            self.send_notification(f"Houston, we have a problem! {errmsg}")
-            self.show_log('Control halted')
-            self.pause()
+            self.show_log(errmsg)
+            if '"code":-32000' in errmsg:
+                self.show_log('known bug on Chromium <= v79')   # ignore Chrome webdriver known error
+            else:
+                self.show_rule_info()
+                self.show_log(traceback.format_exc())
         except Exception as error:
+            self.show_log('Detected unknown exception')
+            self.show_log(str(error))
             self.show_rule_info()
-            self.send_notification(f"Houston, we have a problem! {error}")
-            self.show_log('Control halted')
-            self.pause()
+            self.show_log(traceback.format_exc())
 
 
 if __name__ == '__main__':
