@@ -21,7 +21,18 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.remote.webdriver import WebDriver
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-from selenium.common.exceptions import *
+from selenium.common.exceptions import (
+    ElementNotInteractableException,
+    InvalidSessionIdException,
+    NoAlertPresentException,
+    NoSuchElementException,
+    NoSuchWindowException,
+    SessionNotCreatedException,
+    StaleElementReferenceException,
+    WebDriverException,
+    TimeoutException as SeleniumTimeoutException,
+)
+
 import notification
 import settings
 import cookies
@@ -512,7 +523,7 @@ class MyWeb:
             self.show_status('Running...')
             self.run_json()
 
-        except TimeoutException as error:
+        except SeleniumTimeoutException as error:
             self.show_log("TIMEOUT when running rules!")
             self.show_rule_info()
             self.show_log(traceback.format_exc())
@@ -520,7 +531,7 @@ class MyWeb:
             try:
                 self.driver.get_cookies()   # check if browser still healthy
                 self.page_head = None
-            except TimeoutException:
+            except SeleniumTimeoutException:
                 self.send_notification(f"Houston, we have a problem! {errmsg}")
                 self.pause()
         except NoSuchWindowException:
