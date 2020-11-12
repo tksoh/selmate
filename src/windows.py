@@ -127,33 +127,8 @@ class Window(QDialog):
     def make_window(self):
         self.log_thread = QueueThread(self.log_queue)
         self.notify_thread = QueueThread(self.notify_queue)
-
-        vbox = QVBoxLayout()
         self.setGeometry(400, 400, 500, 500)
-        vbox.addWidget(QLabel("System log:"))
-        self.syslog = QTextEdit()
-        self.syslog.setContextMenuPolicy(Qt.CustomContextMenu)
-        self.syslog.customContextMenuRequested.connect(self.generate_context_menu)
-        self.syslog.setReadOnly(True)
-        vbox.addWidget(self.syslog)
-
-        hbox = QHBoxLayout()
-        vbox.addLayout(hbox)
-        hbox.addWidget(QLabel("Initwait:"))
-        self.progressbar = QProgressBar()
-        self.progressbar.setMaximum(1000)
-        self.progressbar.setValue(0)
-        hbox.addWidget(self.progressbar)
-        self.progressbar.setFormat('0/0')
-        self.progressbar.setAlignment(Qt.AlignCenter)
-        self.progress_enabled = False
-        self.prog_max = 100
-        self.prog_count = 0
-        self.prog_queue_thread = ProgQueueThread(self.progress_queue)
-        self.prog_queue_thread.receiver.connect(self.reset_progress_bar)
-        self.prog_queue_thread.start()
-        self.timer = QTimer()
-        self.timer.timeout.connect(self.move_progress)
+        vbox = QVBoxLayout()
 
         hbox = QHBoxLayout()
         vbox.addWidget(QLabel("Browser Session:"))
@@ -178,6 +153,31 @@ class Window(QDialog):
         hbox.addWidget(self.start_button)
         hbox.addWidget(self.stop_button)
         self.setLayout(vbox)
+
+        vbox.addWidget(QLabel("System log:"))
+        self.syslog = QTextEdit()
+        self.syslog.setContextMenuPolicy(Qt.CustomContextMenu)
+        self.syslog.customContextMenuRequested.connect(self.generate_context_menu)
+        self.syslog.setReadOnly(True)
+        vbox.addWidget(self.syslog)
+
+        hbox = QHBoxLayout()
+        vbox.addLayout(hbox)
+        hbox.addWidget(QLabel("Initwait:"))
+        self.progressbar = QProgressBar()
+        self.progressbar.setMaximum(1000)
+        self.progressbar.setValue(0)
+        hbox.addWidget(self.progressbar)
+        self.progressbar.setFormat('0/0')
+        self.progressbar.setAlignment(Qt.AlignCenter)
+        self.progress_enabled = False
+        self.prog_max = 100
+        self.prog_count = 0
+        self.prog_queue_thread = ProgQueueThread(self.progress_queue)
+        self.prog_queue_thread.receiver.connect(self.reset_progress_bar)
+        self.prog_queue_thread.start()
+        self.timer = QTimer()
+        self.timer.timeout.connect(self.move_progress)
 
         self.status_bar = QLabel()
         self.status_bar.setFrameStyle(QFrame.Panel | QFrame.Sunken)
