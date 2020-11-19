@@ -257,6 +257,8 @@ class MyWeb:
             hd = self.driver.find_element_by_tag_name('head')
         except NoSuchElementException:
             return True
+        except SeleniumTimeoutException:
+            return True
 
         if hd == self.page_head:
             return False
