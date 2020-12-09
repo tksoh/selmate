@@ -337,6 +337,7 @@ class Window(QDialog):
                 self.connect_browser()
                 self.start_button.setDisabled(False)
                 self.postal.log('Browser started')
+                self.start_progress()
 
         def read_output(p):
             self.postal.log(str(p.readAllStandardOutput(), 'utf-8'))
