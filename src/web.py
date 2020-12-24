@@ -359,6 +359,9 @@ class MyWeb:
             pass
         except ElementNotInteractableException:
             pass
+        except SeleniumTimeoutException:
+            self.show_log('Except SeleniumTimeoutException')
+            pass
 
     def check_json_criteria(self, action):
         criterion = action['addon']
