@@ -463,6 +463,14 @@ class MyWeb:
             op = operator.lower()
             if op in ('set', '='):
                 self.json_flags[name] = val
+            elif op in ('decr', '-='):
+                oldval = float(self.json_flags[name])
+                newval = float(val)
+                self.json_flags[name] = str(oldval - newval)
+            elif op in ('incr', '+='):
+                oldval = float(self.json_flags[name])
+                newval = float(val)
+                self.json_flags[name] = str(oldval + newval)
             else:
                 raise Exception(f"Unknown flag operator: '{op}'")
 
