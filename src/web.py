@@ -352,7 +352,6 @@ class MyWeb:
                 else:
                     self.click(elem)
 
-            self.set_json_flags(action)
         except NoSuchElementException:
             pass
         except StaleElementReferenceException:
@@ -411,7 +410,7 @@ class MyWeb:
         return result
 
     def check_json_flags(self, action):
-        flags = action.get('flagCheck', None)
+        flags = action.get('flag', None)
         if not flags:
             return True
 
@@ -449,17 +448,19 @@ class MyWeb:
             else:
                 raise Exception(f"Unknown flag condition operator: '{operator}'")
             final = final and result
+            self.set_json_flags(flag, result)
         return final
 
-    def set_json_flags(self, action):
-        flags = action.get('flagSet', None)
-        if not flags:
+    def set_json_flags(self, flag, cond):
+        dotype = 'true' if cond else 'false'
+        todo_list = flag.get(dotype, None)
+        if todo_list is None:
             return
 
-        for flag in flags:
-            name = flag['name']
-            val = flag['value']
-            operator = flag['op']
+        for todo in todo_list:
+            name = todo['name']
+            val = todo['value']
+            operator = todo['op']
             op = operator.lower()
             if op in ('set', '='):
                 self.json_flags[name] = val
