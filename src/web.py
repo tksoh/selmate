@@ -416,40 +416,53 @@ class MyWeb:
 
         final = True
         for flag in flags:
-            try:
-                name = flag['name']
-                uv = flag['value']
-                operator = flag['condition']
-            except KeyError as error:
-                raise Exception(f"Missing key in flagCheck: '{error}'")
-
-            op = operator.lower()
-            ev = self.json_flags.get(name, "")
-            if op in ('equals', '=='):
-                result = ev == uv
-            elif op in ('notequals', '!='):
-                result = ev != uv
-            elif op in ('contains', '@'):
-                result = uv in ev
-            elif op in ('notcontains', '!@'):
-                result = uv not in ev
-            elif op in ('search', '~'):
-                result = re.search(uv, ev) is not None
-            elif op in ('notsearch', '!~'):
-                result = re.search(uv, ev) is None
-            elif op in ('lessthan', '<'):
-                result = float(ev) < float(uv)
-            elif op in ('lessthanequals', '<='):
-                result = float(ev) <= float(uv)
-            elif op in ('greaterthan', '>'):
-                result = float(ev) > float(uv)
-            elif op in ('greaterthanequals', '>='):
-                result = float(ev) >= float(uv)
-            else:
-                raise Exception(f"Unknown flag condition operator: '{operator}'")
-            final = final and result
+            result = self.flag_evaluate(flag)
             self.set_json_flags(flag, result)
+            final = final and result
         return final
+
+    def flag_evaluate(self, flag):
+        try:
+            name = flag['name']
+            uv = flag['value']
+            operator = flag['condition']
+        except KeyError as error:
+            raise Exception(f"Missing key in flagCheck: '{error}'")
+
+        op = operator.lower()
+        ev = self.json_flags.get(name, "")
+        if op in ('equals', '=='):
+            result = ev == uv
+        elif op in ('notequals', '!='):
+            result = ev != uv
+        elif op in ('contains', '@'):
+            result = uv in ev
+        elif op in ('notcontains', '!@'):
+            result = uv not in ev
+        elif op in ('search', '~'):
+            result = re.search(uv, ev) is not None
+        elif op in ('notsearch', '!~'):
+            result = re.search(uv, ev) is None
+        elif op in ('lessthan', '<'):
+            result = float(ev) < float(uv)
+        elif op in ('lessthanequals', '<='):
+            result = float(ev) <= float(uv)
+        elif op in ('greaterthan', '>'):
+            result = float(ev) > float(uv)
+        elif op in ('greaterthanequals', '>='):
+            result = float(ev) >= float(uv)
+        else:
+            raise Exception(f"Unknown flag condition operator: '{operator}'")
+
+        if 'and' in flag:
+            result2 = self.flag_evaluate(flag['and'])
+            result = result and result2
+
+        if 'or' in flag:
+            result2 = self.flag_evaluate(flag['or'])
+            result = result or result2
+
+        return result
 
     def set_json_flags(self, flag, cond):
         dotype = 'true' if cond else 'false'
