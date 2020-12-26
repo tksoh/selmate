@@ -454,7 +454,10 @@ class MyWeb:
         elif op in ('greaterthanequals', '>='):
             result = float(ev) >= float(uv)
         else:
-            raise Exception(f"Unknown flag condition operator: '{operator}'")
+            raise SyntaxError(f"Unknown flag condition operator: '{operator}'")
+
+        if 'and' in flag and 'or' in flag:
+            raise SyntaxError(f"flag only allows either 'and' or 'or', not both")
 
         if 'and' in flag:
             result2 = self.flag_evaluate(flag['and'])
@@ -584,12 +587,16 @@ class MyWeb:
             else:
                 self.show_rule_info()
                 self.show_log(traceback.format_exc())
+        except SyntaxError as error:
+            self.show_log('Error in JSON file: ' + str(error))
+            self.show_rule_info()
+            self.show_log('Please fix and reload')
+            self.pause()
         except Exception as error:
             self.show_log('Detected unknown exception')
             self.show_log(str(error))
             self.show_rule_info()
             self.show_log(traceback.format_exc())
-
 
 if __name__ == '__main__':
     settings.init()
