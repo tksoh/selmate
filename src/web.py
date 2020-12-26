@@ -431,7 +431,9 @@ class MyWeb:
 
         op = operator.lower()
         ev = self.json_flags.get(name, "")
-        if op in ('equals', '=='):
+        if not name:
+            result = True
+        elif op in ('equals', '=='):
             result = ev == uv
         elif op in ('notequals', '!='):
             result = ev != uv
@@ -475,7 +477,9 @@ class MyWeb:
             val = todo['value']
             operator = todo['op']
             op = operator.lower()
-            if op in ('set', '='):
+            if not name:
+                pass
+            elif op in ('set', '='):
                 self.json_flags[name] = val
             elif op in ('decr', '-='):
                 oldval = float(self.json_flags[name])
