@@ -36,7 +36,7 @@ from selenium.common.exceptions import (
 import notification
 import settings
 import cookies
-from utils import get_wait
+from utils import get_wait, dict_gets
 
 
 def attach_to_session(executor_url, session_id):
@@ -325,7 +325,8 @@ class MyWeb:
             return
 
         try:
-            elem = self.driver.find_element_by_xpath(action['xpath'])
+            xpath = dict_gets(action, ('xpath', 'elementFinder'))
+            elem = self.driver.find_element_by_xpath(xpath)
             if not self.check_json_criteria(action) or \
                     not self.check_json_flags(action):
                 return
@@ -363,12 +364,12 @@ class MyWeb:
             pass
 
     def check_json_criteria(self, action):
-        criterion = action['addon']
-        if criterion['xpath'] == '':
-            return True
-
         try:
-            xpath = criterion['xpath']
+            criterion = action['addon']
+            xpath = dict_gets(criterion, ('xpath', 'elementFinder'))
+            if xpath == '':
+                return True
+
             uv = criterion['value']
             operator = criterion['condition']
         except KeyError as error:
