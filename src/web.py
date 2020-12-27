@@ -593,7 +593,7 @@ class MyWeb:
             self.show_log('Please fix and reload')
             self.pause()
         except Exception as error:
-            self.show_log('Detected unknown exception')
+            self.show_log('Detected unhandled exception: ' + type(error).__name__)
             self.show_log(str(error))
             self.show_rule_info()
             self.show_log(traceback.format_exc())
