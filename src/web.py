@@ -411,16 +411,12 @@ class MyWeb:
         return result
 
     def check_json_flags(self, action):
-        flags = action.get('flag', None)
-        if not flags:
+        flag = action.get('flag', None)
+        if not flag:
             return True
 
-        final = True
-        for flag in flags:
-            result = self.flag_evaluate(flag)
-            self.set_json_flags(flag, result)
-            final = final and result
-        return final
+        result = self.flag_evaluate(flag)
+        return result
 
     def flag_evaluate(self, flag):
         try:
@@ -468,6 +464,7 @@ class MyWeb:
             result2 = self.flag_evaluate(flag['or'])
             result = result or result2
 
+        self.set_json_flags(flag, result)
         return result
 
     def set_json_flags(self, flag, cond):
