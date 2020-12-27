@@ -217,7 +217,7 @@ class MyWeb:
         return self.started
 
     def check_rule_file_modified(self):
-        file = settings.Config['rules']['json_file']
+        file = settings.Config['rules']['rulefile']
         mtime = os.path.getmtime(file)
         if self.rule_file_mtime is None:
             return True
@@ -228,7 +228,7 @@ class MyWeb:
 
     def load_rules(self):
         try:
-            file = settings.Config['rules']['json_file']
+            file = settings.Config['rules']['rulefile']
             self.show_log(f'Loading JSON file \'{file}\'')
             with open(file) as f:
                 self.rule_data = json.load(f)
