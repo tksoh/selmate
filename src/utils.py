@@ -62,3 +62,10 @@ def get_wait(spec):
 
     wait_time = WaitValue(start, stop).value()
     return wait_time
+
+
+def dict_gets(d, keys, default=None):
+    for k in keys:
+        if k in d:
+            return d[k]
+    return default
