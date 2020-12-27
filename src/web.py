@@ -415,10 +415,10 @@ class MyWeb:
         if not flag:
             return True
 
-        result = self.flag_evaluate(flag)
+        result = self.evaluate_flag(flag)
         return result
 
-    def flag_evaluate(self, flag):
+    def evaluate_flag(self, flag):
         try:
             name = flag['name']
             uv = flag['value']
@@ -457,11 +457,11 @@ class MyWeb:
             raise SyntaxError(f"flag only allows either 'and' or 'or', not both")
 
         if 'and' in flag:
-            result2 = self.flag_evaluate(flag['and'])
+            result2 = self.evaluate_flag(flag['and'])
             result = result and result2
 
         if 'or' in flag:
-            result2 = self.flag_evaluate(flag['or'])
+            result2 = self.evaluate_flag(flag['or'])
             result = result or result2
 
         self.set_flags(flag, result)
