@@ -139,19 +139,19 @@ class MyWeb:
         self.postal = postal
         self.started = False
         self.paused = True
-        self.json_file_time = None
-        self.json_data = []
-        self.load_json()
+        self.rule_file_mtime = None
+        self.rule_data = []
+        self.load_rules()
         self.last_url = ""
         self.page_head = None
-        self.json_flags = {}
+        self.rule_flags = {}
         self.current_rule = ""
         self.current_action = ""
         self.current_action_index = -1
 
     def set_url(self):
-        if self.json_data:
-            url = self.json_data[0]['url']
+        if self.rule_data:
+            url = self.rule_data[0]['url']
             parsed_url = urllib.parse.urlparse(url)
             self.url = '{uri.scheme}://{uri.netloc}/'.format(uri=parsed_url)
             self.driver.get(self.url)
@@ -196,7 +196,7 @@ class MyWeb:
 
     def clear(self):
         self.page_head = None
-        self.json_flags = {}
+        self.rule_flags = {}
 
     def show_log(self, text):
         self.postal.log(text)
@@ -216,23 +216,23 @@ class MyWeb:
     def is_started(self):
         return self.started
 
-    def check_json_file_modified(self):
+    def check_rule_file_modified(self):
         file = settings.Config['rules']['json_file']
         mtime = os.path.getmtime(file)
-        if self.json_file_time is None:
+        if self.rule_file_mtime is None:
             return True
-        elif self.json_file_time < mtime:
+        elif self.rule_file_mtime < mtime:
             return True
         else:
             return False
 
-    def load_json(self):
+    def load_rules(self):
         try:
             file = settings.Config['rules']['json_file']
             self.show_log(f'Loading JSON file \'{file}\'')
             with open(file) as f:
-                self.json_data = json.load(f)
-            self.json_file_time = os.path.getmtime(file)
+                self.rule_data = json.load(f)
+            self.rule_file_mtime = os.path.getmtime(file)
         except FileNotFoundError as emsg:
             self.show_log(f'ERROR reading JSON file: {emsg}')
             return False
@@ -244,9 +244,9 @@ class MyWeb:
 
         return True
 
-    def run_json(self):
-        for rule in self.json_data:
-            self.run_json_rule(rule)
+    def process_rules(self):
+        for rule in self.rule_data:
+            self.run_rule(rule)
 
     def check_page_changed(self):
         # check if the page has changed or reloaded
@@ -290,7 +290,7 @@ class MyWeb:
         self.keep_wait = False
         checker.join()
 
-    def run_json_rule(self, rule):
+    def run_rule(self, rule):
         self.current_rule = rule.get('name', '(unknown)')
 
         if not rule['enable']:
@@ -311,9 +311,9 @@ class MyWeb:
             self.current_action_index = idx
             self.show_status(f"Running Rule: '{rule['name']}'. Initwait: {rule['initWait']} "
                              f"[Action #{idx}: '{self.current_action}'. Initwait: {action['initWait']}]")
-            self.run_json_action(action)
+            self.run_action(action)
 
-    def run_json_action(self, action):
+    def run_action(self, action):
         if not action.get('enable', True):
             return
 
@@ -327,8 +327,8 @@ class MyWeb:
         try:
             xpath = dict_gets(action, ('xpath', 'elementFinder'))
             elem = self.driver.find_element_by_xpath(xpath)
-            if not self.check_json_criteria(action) or \
-                    not self.check_json_flags(action):
+            if not self.check_criteria(action) or \
+                    not self.check_flags(action):
                 return
 
             value = action['value']
@@ -363,7 +363,7 @@ class MyWeb:
             self.show_log('Except SeleniumTimeoutException')
             pass
 
-    def check_json_criteria(self, action):
+    def check_criteria(self, action):
         try:
             criterion = action['addon']
             xpath = dict_gets(criterion, ('xpath', 'elementFinder'))
@@ -410,7 +410,7 @@ class MyWeb:
             result = False
         return result
 
-    def check_json_flags(self, action):
+    def check_flags(self, action):
         flag = action.get('flag', None)
         if not flag:
             return True
@@ -427,7 +427,7 @@ class MyWeb:
             raise Exception(f"Missing key in flagCheck: '{error}'")
 
         op = operator.lower()
-        ev = self.json_flags.get(name, "")
+        ev = self.rule_flags.get(name, "")
         if not name:
             result = True
         elif op in ('equals', '=='):
@@ -464,10 +464,10 @@ class MyWeb:
             result2 = self.flag_evaluate(flag['or'])
             result = result or result2
 
-        self.set_json_flags(flag, result)
+        self.set_flags(flag, result)
         return result
 
-    def set_json_flags(self, flag, cond):
+    def set_flags(self, flag, cond):
         dotype = 'true' if cond else 'false'
         todo_list = flag.get(dotype, None)
         if todo_list is None:
@@ -481,15 +481,15 @@ class MyWeb:
             if not name:
                 pass
             elif op in ('set', '='):
-                self.json_flags[name] = val
+                self.rule_flags[name] = val
             elif op in ('decr', '-='):
-                oldval = float(self.json_flags[name])
+                oldval = float(self.rule_flags[name])
                 newval = float(val)
-                self.json_flags[name] = str(oldval - newval)
+                self.rule_flags[name] = str(oldval - newval)
             elif op in ('incr', '+='):
-                oldval = float(self.json_flags[name])
+                oldval = float(self.rule_flags[name])
                 newval = float(val)
-                self.json_flags[name] = str(oldval + newval)
+                self.rule_flags[name] = str(oldval + newval)
             else:
                 raise Exception(f"Unknown flag operator: '{op}'")
 
@@ -553,7 +553,7 @@ class MyWeb:
                 return
 
             self.show_status('Running...')
-            self.run_json()
+            self.process_rules()
 
         except SeleniumTimeoutException as error:
             self.show_log("TIMEOUT when running rules!")

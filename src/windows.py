@@ -249,8 +249,8 @@ class Window(QDialog):
             if reply == QMessageBox.Yes:
                 settings.refresh()
 
-        if self.myweb.check_json_file_modified():
-            if self.myweb.json_data:
+        if self.myweb.check_rule_file_modified():
+            if self.myweb.rule_data:
                 msg = 'JSON file has been modified. Reload it?'
             else:
                 msg = 'JSON file not loaded. Load it?'
@@ -258,10 +258,10 @@ class Window(QDialog):
             reply = QMessageBox.question(self, 'Load JSON', msg,
                                      QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
             if reply == QMessageBox.Yes:
-                if not self.myweb.load_json() and self.myweb.json_data:
+                if not self.myweb.load_rules() and self.myweb.rule_data:
                     self.postal.log("Continue with previously loaded JSON data")
 
-        if self.myweb.json_data:
+        if self.myweb.rule_data:
             self.myweb.clear()
             self.myweb.pause(False)
             self.web_thread = WebThread(self.myweb)
