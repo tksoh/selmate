@@ -455,12 +455,10 @@ class MyWeb:
 
         if 'and' in flag and 'or' in flag:
             raise SyntaxError(f"flag only allows either 'and' or 'or', not both")
-
-        if 'and' in flag:
+        elif 'and' in flag:
             result2 = self.evaluate_flag(flag['and'])
             result = result and result2
-
-        if 'or' in flag:
+        elif 'or' in flag:
             result2 = self.evaluate_flag(flag['or'])
             result = result or result2
 
