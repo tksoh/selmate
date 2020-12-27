@@ -367,7 +367,7 @@ class MyWeb:
         try:
             criterion = action['addon']
             xpath = dict_gets(criterion, ('xpath', 'elementFinder'))
-            if xpath == '':
+            if not xpath:
                 return True
 
             uv = criterion['value']
