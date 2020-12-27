@@ -46,7 +46,9 @@ def wait(spec, counter=None):
 
 
 def get_wait(spec):
-    if spec == "":
+    if type(spec) is int:
+        return spec
+    elif spec == '':
         return 0
 
     arr = re.split(r'[e\s]+', spec.strip())
