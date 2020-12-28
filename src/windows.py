@@ -62,6 +62,7 @@ class Postal(object):
         self.status_queue = win.status_queue
         self.progress_queue = win.progress_queue
         self.notify_queue = win.notify_queue
+        self.alert_queue = win.alert_queue
 
     def log(self, text, timed=True):
         text = str(text).rstrip()
@@ -80,12 +81,15 @@ class Postal(object):
     def countdown(self, seconds):
         self.progress_queue.put(f"{seconds}\n")
 
+    def alert(self):
+        self.alert_queue.put('stop')
 
 class Window(QDialog):
     log_queue = Queue()
     notify_queue = Queue()
     status_queue = Queue()
     progress_queue = Queue()
+    alert_queue = Queue()
 
     def __init__(self):
         super().__init__()
@@ -114,6 +118,7 @@ class Window(QDialog):
     def make_window(self):
         self.log_thread = QueueThread(self.log_queue)
         self.notify_thread = QueueThread(self.notify_queue)
+        self.alert_thread = QueueThread(self.alert_queue)
         self.setGeometry(400, 400, 500, 500)
         vbox = QVBoxLayout()
 
@@ -177,6 +182,8 @@ class Window(QDialog):
         self.log_thread.start()
         self.notify_thread.receiver.connect(self.notify)
         self.notify_thread.start()
+        self.alert_thread.receiver.connect(self.alert)
+        self.alert_thread.start()
 
         self.postal = Postal(self)
         self.postal.status('Idle')
@@ -217,6 +224,10 @@ class Window(QDialog):
 
     def notify(self, text):
         notifyrun(text)
+
+    def alert(self, text):
+        if text == 'stop':
+            self.stop_progress()
 
     def start_progress_bar(self):
         self.set_progress_val(0)

@@ -207,6 +207,9 @@ class MyWeb:
     def countdown(self, count):
         self.postal.countdown(count)
 
+    def send_alert(self):
+        self.postal.alert()
+
     def run_info(self, info_type, value_str):
         if info_type == 'status':
             self.show_status(value_str)
@@ -563,7 +566,7 @@ class MyWeb:
                 self.page_head = None
             except SeleniumTimeoutException:
                 self.send_notification(f"Houston, we have a problem! {errmsg}")
-                self.pause()
+                self.send_alert()
         except NoSuchWindowException:
             self.show_log('Detected NoSuchWindowException error')
             self.show_log(str(error))
@@ -587,7 +590,7 @@ class MyWeb:
             self.show_log('Error in JSON file: ' + str(error))
             self.show_rule_info()
             self.show_log('Please fix and reload')
-            self.pause()
+            self.send_alert()
         except Exception as error:
             self.show_log('Detected unhandled exception: ' + type(error).__name__)
             self.show_log(str(error))
