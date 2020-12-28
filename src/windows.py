@@ -55,19 +55,6 @@ class QueueThread(QThread):
             self.receiver.emit(text)
 
 
-class ProgQueueThread(QThread):
-    receiver = pyqtSignal(str)
-
-    def __init__(self, queue):
-        super().__init__()
-        self.queue = queue
-
-    def run(self):
-        while True:
-            text = self.queue.get()
-            self.receiver.emit(text)
-
-
 class Postal(object):
     def __init__(self, win):
         self.window = win
@@ -173,7 +160,7 @@ class Window(QDialog):
         self.progress_enabled = False
         self.prog_max = 100
         self.prog_count = 0
-        self.prog_queue_thread = ProgQueueThread(self.progress_queue)
+        self.prog_queue_thread = QueueThread(self.progress_queue)
         self.prog_queue_thread.receiver.connect(self.reset_progress_bar)
         self.prog_queue_thread.start()
         self.timer = QTimer()
