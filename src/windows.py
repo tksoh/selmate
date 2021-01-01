@@ -43,7 +43,7 @@ class WebThread(QThread):
 
 
 class QueueThread(QThread):
-    receiver = pyqtSignal(str)
+    receiver = pyqtSignal(str, str)
 
     def __init__(self, queue):
         super().__init__()
@@ -51,18 +51,14 @@ class QueueThread(QThread):
 
     def run(self):
         while True:
-            text = self.queue.get()
-            self.receiver.emit(text)
+            mtype, text = self.queue.get()
+            self.receiver.emit(mtype, text)
 
 
 class Postal(object):
     def __init__(self, win):
         self.window = win
-        self.log_queue = win.log_queue
-        self.status_queue = win.status_queue
-        self.progress_queue = win.progress_queue
-        self.notify_queue = win.notify_queue
-        self.alert_queue = win.alert_queue
+        self.web_queue = win.web_queue
 
     def log(self, text, timed=True):
         text = str(text).rstrip()
@@ -72,24 +68,20 @@ class Postal(object):
         else:
             msg = text
 
-        self.log_queue.put(msg)
-        self.notify_queue.put(msg)
+        self.web_queue.put(('log', msg))
 
     def status(self, text):
-        self.status_queue.put(text)
+        self.web_queue.put(('status', text))
 
     def countdown(self, seconds):
-        self.progress_queue.put(f"{seconds}\n")
+        self.web_queue.put(('progress', f"{seconds}\n"))
 
     def alert(self):
-        self.alert_queue.put('stop')
+        self.web_queue.put(('alert', 'stop'))
+
 
 class Window(QDialog):
-    log_queue = Queue()
-    notify_queue = Queue()
-    status_queue = Queue()
-    progress_queue = Queue()
-    alert_queue = Queue()
+    web_queue = Queue()
 
     def __init__(self):
         super().__init__()
@@ -116,9 +108,7 @@ class Window(QDialog):
         self.setWindowTitle(f"{AppName} [{project}]")
 
     def make_window(self):
-        self.log_thread = QueueThread(self.log_queue)
-        self.notify_thread = QueueThread(self.notify_queue)
-        self.alert_thread = QueueThread(self.alert_queue)
+        self.web_queue_thread = QueueThread(self.web_queue)
         self.setGeometry(400, 400, 500, 500)
         vbox = QVBoxLayout()
 
@@ -165,25 +155,15 @@ class Window(QDialog):
         self.progress_enabled = False
         self.prog_max = 100
         self.prog_count = 0
-        self.prog_queue_thread = QueueThread(self.progress_queue)
-        self.prog_queue_thread.receiver.connect(self.reset_progress_bar)
-        self.prog_queue_thread.start()
-        self.timer = QTimer()
-        self.timer.timeout.connect(self.move_progress)
 
         self.status_bar = QLabel()
         self.status_bar.setFrameStyle(QFrame.Panel | QFrame.Sunken)
         vbox.addWidget(self.status_bar)
-        self.status_thread = QueueThread(self.status_queue)
-        self.status_thread.receiver.connect(self.status_update)
-        self.status_thread.start()
 
-        self.log_thread.receiver.connect(self.log)
-        self.log_thread.start()
-        self.notify_thread.receiver.connect(self.notify)
-        self.notify_thread.start()
-        self.alert_thread.receiver.connect(self.alert)
-        self.alert_thread.start()
+        self.web_queue_thread.receiver.connect(self.web_queue_dispatch)
+        self.web_queue_thread.start()
+        self.timer = QTimer()
+        self.timer.timeout.connect(self.move_progress)
 
         self.postal = Postal(self)
         self.postal.status('Idle')
@@ -212,6 +192,20 @@ class Window(QDialog):
             self.connect_settings.setText(info)
         except KeyError:
             pass
+
+    def web_queue_dispatch(self, mtype, text):
+        if mtype == 'log':
+            self.log(text)
+        elif mtype == 'status':
+            self.status_update(text)
+        elif mtype == 'alert':
+            self.alert(text)
+        elif mtype == 'notify':
+            self.status_update(text)
+        elif mtype == 'progress':
+            self.reset_progress_bar(text)
+        else:
+            raise Exception(f"Unknown queue type {mtype}")
 
     def log(self, text):
         self.syslog.moveCursor(QTextCursor.End)
