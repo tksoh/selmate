@@ -36,7 +36,7 @@ from selenium.common.exceptions import (
 import notification
 import settings
 import cookies
-from utils import get_wait, dict_gets
+from utils import get_wait, dict_gets, to_value
 
 
 def attach_to_session(executor_url, session_id):
@@ -400,13 +400,13 @@ class MyWeb:
             elif op in ('notsearch', '!~'):
                 result = re.search(uv, ev) is None
             elif op in ('lessthan', '<'):
-                result = float(ev) < float(uv)
+                result = to_value(ev) < to_value(uv)
             elif op in ('lessthanequals', '<='):
-                result = float(ev) <= float(uv)
+                result = to_value(ev) <= to_value(uv)
             elif op in ('greaterthan', '>'):
-                result = float(ev) > float(uv)
+                result = to_value(ev) > to_value(uv)
             elif op in ('greaterthanequals', '>='):
-                result = float(ev) >= float(uv)
+                result = to_value(ev) >= to_value(uv)
             else:
                 raise Exception(f"Unknown condition operator: '{operator}'")
         except NoSuchElementException:
@@ -446,13 +446,13 @@ class MyWeb:
         elif op in ('notsearch', '!~'):
             result = re.search(uv, ev) is None
         elif op in ('lessthan', '<'):
-            result = float(ev) < float(uv)
+            result = to_value(ev) < to_value(uv)
         elif op in ('lessthanequals', '<='):
-            result = float(ev) <= float(uv)
+            result = to_value(ev) <= to_value(uv)
         elif op in ('greaterthan', '>'):
-            result = float(ev) > float(uv)
+            result = to_value(ev) > to_value(uv)
         elif op in ('greaterthanequals', '>='):
-            result = float(ev) >= float(uv)
+            result = to_value(ev) >= to_value(uv)
         else:
             raise SyntaxError(f"Unknown flag condition operator: '{operator}'")
 
@@ -484,12 +484,12 @@ class MyWeb:
             elif op in ('set', '='):
                 self.rule_flags[name] = val
             elif op in ('decr', '-='):
-                oldval = float(self.rule_flags[name])
-                newval = float(val)
+                oldval = to_value(self.rule_flags[name])
+                newval = to_value(val)
                 self.rule_flags[name] = str(oldval - newval)
             elif op in ('incr', '+='):
-                oldval = float(self.rule_flags[name])
-                newval = float(val)
+                oldval = to_value(self.rule_flags[name])
+                newval = to_value(val)
                 self.rule_flags[name] = str(oldval + newval)
             else:
                 raise Exception(f"Unknown flag operator: '{op}'")

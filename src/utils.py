@@ -69,3 +69,12 @@ def dict_gets(d, keys, default=None):
         if k in d:
             return d[k]
     return default
+
+def to_value(src):
+    if src == '':
+        return 0
+
+    try:
+        return int(src)
+    except ValueError:
+        return float(src)
